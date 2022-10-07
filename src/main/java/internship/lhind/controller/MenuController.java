@@ -52,16 +52,19 @@ public class MenuController {
             return ResponseEntity.ok(menuService.findAllForAdmin());
         return ResponseEntity.ok(menuService.findAll());
     }
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getById(@PathVariable(name = "id") Integer id
-            , HttpServletRequest request) throws Exception{
+    private Restaurant menuQuery(Integer id) throws InvalidDataException{
         Menu menu = menuService.findByIdAll(id);
         if (menu == null)
             throw new NullPointerException("MENU WITH ID " + id);
-        String username = authController.usernameFromToken(request);
         if (menu.getRestaurant() == null)
             throw new InvalidDataException("Menu doesnt have a restaurant");
-        Restaurant restaurant = menu.getRestaurant();
+        return menu.getRestaurant();
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getById(@PathVariable(name = "id") Integer id
+            , HttpServletRequest request) throws Exception{
+        String username = authController.usernameFromToken(request);
+        Restaurant restaurant = menuQuery(id);
         //manager and admin get the menu even if it is invalid
         if (restaurant.getManager() != null && (restaurant.getManager().getUserName().equals(username)
                 || authController.isAdmin(request)))
@@ -71,13 +74,8 @@ public class MenuController {
     @GetMapping("/{id}/items")
     public ResponseEntity<?> getItemsOfAMenu(@PathVariable(name = "id") Integer id
             , HttpServletRequest request) throws Exception{
-        Menu menu = menuService.findByIdAll(id);
-        if (menu == null)
-            throw new NullPointerException("MENU WITH ID " + id);
         String username = authController.usernameFromToken(request);
-        if (menu.getRestaurant() == null)
-            throw new InvalidDataException("Menu doesnt have a restaurant");
-        Restaurant restaurant = menu.getRestaurant();
+        Restaurant restaurant = menuQuery(id);
         //manager gets all items
         if (restaurant.getManager() != null && restaurant.getManager().getUserName().equals(username))
             return ResponseEntity.ok(menuService.findAllItemsOfAMenu(id));

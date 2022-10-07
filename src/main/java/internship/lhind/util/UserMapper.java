@@ -9,7 +9,6 @@ import org.mapstruct.NullValueCheckStrategy;
 
 @Mapper(componentModel = "spring", nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface UserMapper {
-    @Mapping(source = "userName", target = "userName")
     @Mapping(source = "user.userDetails.firstName", target = "firstName")
     @Mapping(source = "user.userDetails.lastName", target = "lastName")
     @Mapping(source = "user.userDetails.phoneNumber", target = "phoneNumber")
