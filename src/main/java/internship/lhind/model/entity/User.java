@@ -1,11 +1,16 @@
 package internship.lhind.model.entity;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.List;
 
 @Entity
 @Table
+@Where(clause = "status_id=1")
+@SQLDelete(sql = "UPDATE user SET status_id = 3 WHERE id=?")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

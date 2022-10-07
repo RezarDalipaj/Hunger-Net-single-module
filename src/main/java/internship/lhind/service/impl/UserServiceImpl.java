@@ -73,36 +73,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto findById(Integer id) {
         Optional <User> user = userRepository.findById(id);
-        if (user.isPresent()){
-            User user1 = user.get();
-            if (user1.getStatus().getStatus().equals("VALID"))
-                return userMapper.convertUserToDto(user1);
-            else
-                throw new NullPointerException("USER WITH ID " + id);
-        }
+        if (user.isPresent())
+            return userMapper.convertUserToDto(user.get());
         else
             throw new NullPointerException("USER WITH ID " + id);
     }
     @Override
     public User findByIdd(Integer id) {
         Optional <User> user = userRepository.findById(id);
-        if (user.isPresent()){
-            User user1 = user.get();
-            if (user1.getStatus().getStatus().equals("VALID"))
-                return user1;
-            else
-                throw new NullPointerException("USER WITH ID " + id);
-        }
+        if (user.isPresent())
+            return user.get();
         else
             throw new NullPointerException("USER WITH ID " + id);
     }
     //all users
     public List<UserDto> findAllValid(){
-        Status status = statusRepository.findStatusByStatus("VALID");
-        if (status.getUsers() == null)
-            throw new NullPointerException("USERS");
-        List<User> users = status.getUsers();
-        return users.stream().map(userMapper::convertUserToDto).collect(Collectors.toList());
+        return userRepository.findAll().stream().map(userMapper::convertUserToDto).collect(Collectors.toList());
     }
     //all users without admins
     @Override
@@ -151,11 +137,7 @@ public class UserServiceImpl implements UserService {
         deletePossibleRestaurants(user);
         deleteOrdersOfAUser(user);
         removeUserFromPreviousRoles(user);
-        Status status = statusRepository.findStatusByStatus("DELETED");
-        user.setStatus(status);
-        user.getUserDetails().setStatus(status);
-        userDetailsRepository.save(user.getUserDetails());
-        userRepository.save(user);
+        userRepository.deleteById(id);
     }
     public void deletePossibleRestaurants(User user){
         if (user.getRestaurant()!=null){
@@ -432,7 +414,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto findUserByUserName(String username) {
         User user = userRepository.findUserByUserName(username);
-        if(user != null && user.getStatus().getStatus().equals("VALID"))
+        if(user != null)
             return userMapper.convertUserToDto(user);
         else
             return null;
@@ -440,9 +422,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByUserName(String username) {
-        User user = userRepository.findUserByUserName(username);
-        if (user != null && user.getStatus().getStatus().equals("VALID"))
-            return userRepository.findUserByUserName(username);
-        return null;
+        return userRepository.findUserByUserName(username);
     }
 }

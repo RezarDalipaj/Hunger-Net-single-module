@@ -1,9 +1,14 @@
 package internship.lhind.model.entity;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "user_details")
+@Where(clause = "status_id=1")
+@SQLDelete(sql = "UPDATE user_details SET status_id = 3 WHERE id=?")
 public class UserDetails {
     @Id
     @Column
